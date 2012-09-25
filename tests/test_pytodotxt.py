@@ -33,8 +33,7 @@ class Test(unittest.TestCase):
         self.assertEquals(10, len(self.todo.entrys))
 
         # Write to another file
-        self.todo.filename = new_filename
-        self.todo.write()
+        self.todo.write(new_filename)
 
         lines = []
         with open(new_filename, 'r') as f:

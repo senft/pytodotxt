@@ -7,6 +7,7 @@ TODO:
       altered
     - Rule 2: The date of completion appears directly after the x, separated by
       a space.
+    - Ability to keep backups
 """
 
 from datetime import datetime
@@ -47,11 +48,13 @@ class Entry(dict):
 
 
 class TodoTxt():
-    def __init__(self, file):
-        self.filename = file
+    def __init__(self, filename=None):
         self.entrys = list()
+        if filename:
+            self.read(filename)
 
-        with open(self.filename, 'r') as f:
+    def read(self, filename):
+        with open(filename, 'r') as f:
             for line in f:
                 try:
                     new_entry = self._parse_entry(line)
@@ -117,13 +120,13 @@ class TodoTxt():
         return Entry(idn=len(self.entrys), text=text, done=done, prio=prio,
                      date=date)
 
-    def write(self):
+    def write(self, filename):
         """Writes all entrys to the file they have been read from."""
-        with open(self.filename, 'w') as f:
+        with open(filename, 'w') as f:
             for entry in self.entrys:
                 f.write(str(entry) + '\n')
             logging.info('Wrote {0} entrys to file {1}'.format(
-                len(self.entrys), self.filename))
+                len(self.entrys), filename))
 
     def _sort(self, entry):
         """Sorts all entrys, after the following criterea:
