@@ -70,9 +70,17 @@ class TodoTxt():
         self.entrys.sort(key=self._sort)
 
     def do(self, id, add_date=False):
-        pass
+        """Marks the entry with the given ID as 'done'. Returns true if the
+        state was changed, else False."""
+        for entry in self.entrys:
+            if entry['id'] == id:
+                already_done = entry['done']
+                entry['done'] = True
+                return not already_done
+        raise False
 
     def remove(self, id):
+        """Removes the entry with the given ID from the list of entrys."""
         pass
 
     def get(self, keywords=[], projects=[], contexts=[], sorted=True):
