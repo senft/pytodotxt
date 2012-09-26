@@ -149,20 +149,30 @@ class TodoTxt():
         else:
             return ''.join(['A', entry['prio'], entry['text']])
 
+    def __str__(self):
+        """Creates a string represetation for this entry."""
+        result = []
+        for entry in self.entrys:
+            result.append(str(entry))
+        return '\n'.join(result)
 
-#def main():
-#    FILE = 'todo.txt'
-#    try:
-#        todo = TodoTxt(FILE)
-#    except IOError:
-#        logging.error('Could not open file ({0})'.format(FILE))
-#        sys.exit(1)
-#
-#    print(todo)
-#
-#    #todo.add('Was geht ab? @rl +uni', prio='A', date='2012-12-12')
-#    #todo.write()
-#
-#
-#if __name__ == '__main__':
-#    main()
+
+def main():
+    FILE = 'todo.txt'
+
+    try:
+        todo = TodoTxt(FILE)
+    except IOError:
+        logging.error('Could not open file ({0})'.format(FILE))
+        import sys
+        sys.exit(1)
+
+    print(todo)
+
+    todo.do(2)
+
+    print(todo)
+
+
+if __name__ == '__main__':
+    main()
