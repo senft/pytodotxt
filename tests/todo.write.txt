@@ -1,10 +1,10 @@
+Domainkündigung aufheben?
 2012-08-10 This haz a date
-A test @dev
+x (A) Generator fertig machen @uni +aa
+x
+Grub
 (B) Handy Vertrag kündigen
 (D) Zertifikat abholen
-Domainkündigung aufheben?
-Grub
-Handy kaufen
-x 
 x 2012-09-20 Isos hochladen +server +aa
-x (A) Generator fertig machen @uni +aa
+Handy kaufen
+A test @dev

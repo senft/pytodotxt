@@ -41,7 +41,9 @@ class Test(unittest.TestCase):
                 lines.append(line.strip())
 
         for entry in self.todo.entrys:
-            self.assertTrue(str(entry in lines))
+            string = self.todo._entry_to_string(entry)
+            self.assertTrue(string in lines,
+                            '[{0}] has not been written to file'.format(string))
 
 
 class TestStr(unittest.TestCase):
@@ -59,7 +61,7 @@ class TestStr(unittest.TestCase):
                 lines.append(line.strip())
 
         for entry in self.todo.entrys:
-            self.assertTrue(str(entry) in lines)
+            self.assertTrue(self.todo._entry_to_string(entry) in lines)
 
 
 class TestNoFile(unittest.TestCase):

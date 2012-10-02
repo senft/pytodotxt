@@ -3,8 +3,6 @@
 
 """
 TODO:
-    - It's bad that we rewrite the entrys sorted.. The order should not be
-      altered
     - Rule 2: The date of completion appears directly after the x, separated by
       a space.
     - Ability to keep backups
@@ -18,35 +16,6 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     level=logging.DEBUG)
 
 
-class Entry(dict):
-    def __init__(self, idn=0, done=False, date='', prio='', text=''):
-        dict.__init__(self)
-        self['id'] = idn
-        self['done'] = done
-        self['prio'] = prio
-        self['date'] = date
-        self['text'] = text
-        self['contexts'] = [c.replace('@', '') for c in re.findall(r'@\S+',
-                                                                   text)]
-        self['projects'] = [p.replace('+', '') for p in re.findall(r'\+\S+',
-                                                                   text)]
-
-    def __str__(self):
-        """Creates a string represetation for this entry."""
-        result = []
-        if self['done']:
-            result.append('x ')
-
-        if self['prio']:
-            result.extend(['(', self['prio'], ') '])
-
-        if self['date']:
-            result.extend([self['date'], ' '])
-
-        result.append(self['text'])
-        return ''.join(result)
-
-
 class TodoTxt():
     def __init__(self, filename=None):
         self.entrys = list()
@@ -54,6 +23,7 @@ class TodoTxt():
             self.read(filename)
 
     def read(self, filename):
+        """Reads a given todo.txt file."""
         with open(filename, 'r') as f:
             for line in f:
                 try:
@@ -61,13 +31,15 @@ class TodoTxt():
                     self.entrys.append(new_entry)
                 except ValueError:
                     logging.warning('Could not parse line: [{0}]'.format(line))
-            self.entrys.sort(key=self._sort)
             logging.info('Read {0} entry(s)'.format(len(self.entrys)))
 
     def add(self, text, prio='', date=''):
-        new_entry = Entry(text=text, prio=prio, date=date)
+        contexts = [c.replace('@', '') for c in re.findall(r'@\S+', text)]
+        projects = [p.replace('+', '') for p in re.findall(r'\+\S+', text)]
+        new_entry = {'id': len(self.entrys), 'text': text, 'done': False,
+                     'prio': prio, 'date': date, 'contexts': contexts,
+                     'projects': projects}
         self.entrys.append(new_entry)
-        self.entrys.sort(key=self._sort)
 
     def do(self, id, add_date=False):
         """Marks the entry with the given ID as 'done'. Returns true if the
@@ -81,7 +53,9 @@ class TodoTxt():
 
     def remove(self, id):
         """Removes the entry with the given ID from the list of entrys."""
-        pass
+        for entry in self.entrys:
+            if entry['id'] == id:
+                self.entrys.remove(entry)
 
     def get(self, keywords=[], projects=[], contexts=[], sorted=True):
         """Returns the entrys that contain all of the given fields.
@@ -100,7 +74,16 @@ class TodoTxt():
                 and all([context in entry['contexts'] for context in contexts])
                 ]
 
+    def write(self, filename):
+        """Writes all entrys to a given file."""
+        with open(filename, 'w') as f:
+            for entry in self.entrys:
+                f.write(self._entry_to_string(entry) + '\n')
+            logging.info('Wrote {0} entrys to file {1}'.format(
+                len(self.entrys), filename))
+
     def _parse_entry(self, line):
+        """Parses a line from a todo.txt file into a dict."""
         if not line.strip():
             # Catches empty lines
             raise ValueError
@@ -125,22 +108,35 @@ class TodoTxt():
             date = ''
 
         text = line.strip()
-        return Entry(idn=len(self.entrys), text=text, done=done, prio=prio,
-                     date=date)
 
-    def write(self, filename):
-        """Writes all entrys to the file they have been read from."""
-        with open(filename, 'w') as f:
-            for entry in self.entrys:
-                f.write(str(entry) + '\n')
-            logging.info('Wrote {0} entrys to file {1}'.format(
-                len(self.entrys), filename))
+        contexts = [c.replace('@', '') for c in re.findall(r'@\S+', text)]
+        projects = [p.replace('+', '') for p in re.findall(r'\+\S+', text)]
+
+        return {'id': len(self.entrys), 'text': text, 'done': done, 'prio':
+                prio, 'date': date, 'contexts': contexts, 'projects': projects}
+
+    def _entry_to_string(self, entry):
+        """Creates a string represetation for this entry."""
+        result = []
+        if entry['done']:
+            result.append('x ')
+
+        if entry['prio']:
+            result.extend(['(', entry['prio'], ') '])
+
+        if entry['date']:
+            result.extend([entry['date'], ' '])
+
+        result.append(entry['text'])
+        return ''.join(result).strip()
 
     def _sort(self, entry):
         """Sorts all entrys, after the following criterea:
-             - Done?
-             - Date
-             - Text
+            - Done?
+            - Date
+            - Text
+        This is only used when creating a string representation of this object,
+        so we don't change order of the entrys.
         """
         if entry['done']:
             return ''.join(['Z', entry['prio'], entry['date'], entry['text']])
@@ -152,8 +148,8 @@ class TodoTxt():
     def __str__(self):
         """Creates a string represetation for this entry."""
         result = []
-        for entry in self.entrys:
-            result.append(str(entry))
+        for entry in sorted(self.entrys, key=self._sort):
+            result.append(self._entry_to_string(entry))
         return '\n'.join(result)
 
 
@@ -169,9 +165,8 @@ def main():
 
     print(todo)
 
-    todo.do(2)
-
-    print(todo)
+    #todo.do(2)
+    #todo.remove(2)
 
 
 if __name__ == '__main__':
