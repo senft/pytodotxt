@@ -10,7 +10,7 @@ TODO:
 
 from datetime import datetime
 import logging
-import re
+from re import findall
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     level=logging.DEBUG)
@@ -34,8 +34,8 @@ class TodoTxt():
             logging.info('Read {0} entry(s)'.format(len(self.entrys)))
 
     def add(self, text, prio='', date=''):
-        contexts = [c.replace('@', '') for c in re.findall(r'@\S+', text)]
-        projects = [p.replace('+', '') for p in re.findall(r'\+\S+', text)]
+        contexts = [c.replace('@', '') for c in findall(r'@\S+', text)]
+        projects = [p.replace('+', '') for p in findall(r'\+\S+', text)]
         new_entry = {'id': len(self.entrys), 'text': text, 'done': False,
                      'prio': prio, 'date': date, 'contexts': contexts,
                      'projects': projects}
@@ -109,8 +109,8 @@ class TodoTxt():
 
         text = line.strip()
 
-        contexts = [c.replace('@', '') for c in re.findall(r'@\S+', text)]
-        projects = [p.replace('+', '') for p in re.findall(r'\+\S+', text)]
+        contexts = [c.replace('@', '') for c in findall(r'@\S+', text)]
+        projects = [p.replace('+', '') for p in findall(r'\+\S+', text)]
 
         return {'id': len(self.entrys), 'text': text, 'done': done, 'prio':
                 prio, 'date': date, 'contexts': contexts, 'projects': projects}
