@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import unittest
-from pytodotxt.pytodotxt import TodoTxt
+from pytodotxt import TodoTxt
 
 
 class Test(unittest.TestCase):
